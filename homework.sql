@@ -174,6 +174,54 @@ GROUP BY rental.inventory_id
 ORDER BY COUNT(rental.inventory_id) desc;
 
 /* 7f. Write a query to display how much business, in dollars, each store brought in.*/
-SELECT store_id, SUM(amount)
+SELECT store.store_id, SUM(amount)
 FROM store
-INNER JOIN 
+INNER JOIN staff
+ON store.store_id = staff.store_id
+INNER JOIN payment
+ON payment.staff_id = staff.staff_id
+GROUP BY store.store_id
+ORDER BY SUM(amount);
+
+/* 7g. Write a query to display for each store its store ID, city, and country.*/
+SELECT store.store_id, city, country
+FROM store
+INNER JOIN customer
+ON customer.store_id = store.store_id
+INNER JOIN address
+ON address.address_id = customer.address_id
+INNER JOIN city
+ON city.city_id = address.city_id
+INNER JOIN country
+ON country.country_id = city.country_id;
+
+/* 7h. List the top five genres in gross revenue in descending order.*/
+SELECT name, SUM(payment.amount)
+FROM category
+INNER JOIN film_category
+INNER JOIN inventory
+ON film_category.film_id = inventory.film_id
+INNER JOIN rental
+ON rental.inventory_id = inventory.inventory_id
+INNER JOIN payment
+GROUP BY name
+ORDER BY SUM(payment.amount) desc
+LIMIT 5;
+
+/* 8a. In your new role as an executive,
+you would like to have an easy way of viewing the Top five genres by gross revenue.
+Use the solution from the problem above to create a view. If you haven't solved 7h,
+you can substitute another query to create a view.*/
+
+CREATE VIEW top_five_grossing_genres AS
+
+SELECT name, SUM(p.amount)
+FROM category c
+INNER JOIN film_category fc
+INNER JOIN inventory i
+ON i.film_id = fc.film_id
+INNER JOIN rental r
+ON r.inventory_id = i.inventory_id
+INNER JOIN payment p
+GROUP BY name
+LIMIT 5;
