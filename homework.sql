@@ -215,13 +215,22 @@ you can substitute another query to create a view.*/
 
 CREATE VIEW top_five_grossing_genres AS
 
-SELECT name, SUM(p.amount)
-FROM category c
-INNER JOIN film_category fc
-INNER JOIN inventory i
-ON i.film_id = fc.film_id
-INNER JOIN rental r
-ON r.inventory_id = i.inventory_id
-INNER JOIN payment p
+SELECT name, SUM(payment.amount)
+FROM category
+INNER JOIN film_category
+INNER JOIN inventory
+ON film_category.film_id = inventory.film_id
+INNER JOIN rental
+ON rental.inventory_id = inventory.inventory_id
+INNER JOIN payment
 GROUP BY name
+ORDER BY SUM(payment.amount) desc
 LIMIT 5;
+
+/* 8b. How would you display the view that you created in 8a?*/
+SELECT *
+FROM top_five_grossing_genres;
+
+/* 8c. You find that you no longer need the view `top_five_genres`.
+Write a query to delete it.*/
+DROP VIEW top_five_grossing_genres;
